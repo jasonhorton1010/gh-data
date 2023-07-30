@@ -18,6 +18,8 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    outputs: #script-file below can be any name # outputs is to create output from th job, to be used by other jobs
+      script-file: ${{ steps.publish.outputs.script-file }} # publish is the id of the step
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -25,6 +27,9 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+      - name: Publish js filename
+        id: publish # this can be any name
+        run: find dist/assets/*.js -type f -execdir echo 'script-file={} >> $GITHUB.OUTPUT ' ';'
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
